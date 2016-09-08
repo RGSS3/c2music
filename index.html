@@ -104,6 +104,8 @@
    Handlers["y.qq.com"] = simple("http://y.qq.com", "http://y.qq.com/portal/search.html#searchid=1&remoteplace=txt.yqq.top&t=song&w=");
    Handlers["www.xiami.com"] = simple("http://www.xiami.com", "http://www.xiami.com/search?pos=1&key=", {shadow: true});
    Handlers["www.kuwo.cn"] = simple("http://www.kuwo.cn", "http://sou.kuwo.cn/ws/NSearch?type=all&catalog=yueku2016&key=", {"shadow": true});
+   Handlers["www.iqiyi.com"] = simple("http://www.iqiyi.com",  "http://so.iqiyi.com/so/q_", {shadow: true});
+   Handlers["www.u77.com"] = simple("http://www.u77.com", "http://www.u77.com/searchAll?type=1&items=", {shadow: true});
    query("service").innerHTML = "";
    for(var name in Handlers){
        var opt = document.createElement("option");

@@ -7,5 +7,6 @@
    },
    "webkit": {
       "plugin": true
-   }
+   },
+  "single-instance": false
 }
