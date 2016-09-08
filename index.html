@@ -42,7 +42,7 @@
             if(!a.href.match(/^javascript:/)){
              var f = a.href;
              a.href = '#';
-             a.onclick = function(){  src("shadow-music", f); };
+             a.onclick = function(){  Gl.url = f; src("shadow-music", f); };
              a.target = 'shadow-music';
              console.log(a);
             }
