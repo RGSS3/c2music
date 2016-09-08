@@ -1,0 +1,127 @@
+﻿<meta charset="UTF-8">
+<style>
+  #toolbar {
+     position: fixed;  
+  }
+  #shadow-music{
+     width: 100%;
+     height: 1024;
+     border: none;
+  }
+</style>
+<div id="toolbar">
+<input id="keyword"></input>
+<label for="service">服务商</label>
+<select id="service">
+</select>
+<button id="go">go</button>
+<button id="login">login</button>
+<button id="share">share</button>
+</div>
+<script src="js/main.js"></script>
+
+<webview id="music"></webview>
+<iframe id="shadow-music"></iframe>
+<script>
+   var Handlers = Object.create(null);
+   var reset = function(){
+     src("music", "about:blank");  query("music").style.display = "none";
+     src("shadow-music", "about:blank");  query("shadow-music").style.display = "none";
+   };
+   var Gl = {};
+   var setInternalWindow = function(o){
+         var f = function(iframe){  
+          iframe.onload = function(){
+           iframe.contentWindow.open = function(s){
+            src("shadow-music", s);
+            Gl.url = s;
+            query("shadow-music").style.display = "block"; 
+          };
+          var win = iframe.contentWindow;
+          win.Array.prototype.forEach.call(win.document.querySelectorAll("a"), function(a){
+            if(!a.href.match(/^javascript:/)){
+             var f = a.href;
+             a.href = '#';
+             a.onclick = function(){  src("shadow-music", f); };
+             a.target = 'shadow-music';
+             console.log(a);
+            }
+           });
+           win.Array.prototype.forEach.call(win.document.querySelectorAll("iframe"), function(a){
+             f(a);
+           });
+         };
+      }
+      f(o);
+    
+   };
+   window.open = function(s){
+         src("shadow-music", s);
+   };
+   var simple = function(url, search, opt){
+     var t = {};
+     if(opt && opt["shadow"]){
+        t.search = function(){ reset(); src("shadow-music", search + asKeyword("keyword"));  query("shadow-music").style.display = "block"; 
+        setInternalWindow(query("shadow-music"))};    
+     }else{
+        t.search = function(){ reset(); src("music", search + asKeyword("keyword"));  query("music").style.display = "block";};
+     };
+     t.login   = function(){ window.open(url); };
+     return t;
+   };
+   Handlers["music.163.com"] = simple("http://music.163.com","http://music.163.com/#/search/m/?%23%2Fmsg%2Fm%2Fprivate=&s=");
+   Handlers["y.qq.com"] = simple("http://y.qq.com", "http://y.qq.com/portal/search.html#searchid=1&remoteplace=txt.yqq.top&t=song&w=");
+   Handlers["www.xiami.com"] = simple("http://www.xiami.com", "http://www.xiami.com/search?pos=1&key=", {shadow: true});
+   Handlers["www.kuwo.cn"] = simple("http://www.kuwo.cn", "http://sou.kuwo.cn/ws/NSearch?type=all&catalog=yueku2016&key=", {"shadow": true});
+   query("service").innerHTML = "";
+   for(var name in Handlers){
+       var opt = document.createElement("option");
+       opt.value = opt.innerText = name;
+       query("service").appendChild(opt);
+   };
+   click("go", function(){
+       var name = value(query("service"));       
+       Handlers[name].search();
+   });
+
+ click("login", function(){
+       var name = value(query("service"));       
+       Handlers[name].login();
+   });
+   var nw     = require('nw.gui');
+   var win    = nw.Window.get();
+   var clip    = nw.Clipboard.get();
+   click("share", function(){
+     if(window.confirm(Gl.url)){
+        clip.set(Gl.url, 'text');
+     } 
+   });
+   win.maximize();
+   win.on('minimize', function(){
+      var tray   = new nw.Tray({title: 'c2music', 'icon': 'image/icon.png'});
+      var menu = new nw.Menu();
+      var menuItem = new nw.MenuItem({
+        label: "restore",
+        click: function(){
+           win.setShowInTaskbar(true);
+           win.restore();
+           tray.remove();
+        }
+     });
+     win.on('navigation', function(f, u, p){
+       p.ignore();
+       reset();
+       src('shadow-music', u);
+       query('shadow-music').display = "block";
+     });
+    win.on('new-win-policy', function(f, u, p){
+       p.ignore();
+       reset();
+       src('shadow-music', u);
+       query('shadow-music').display = "block";
+     });
+     menu.append(menuItem);
+     tray.menu = menu;
+     win.setShowInTaskbar(false);
+  });
+</script>

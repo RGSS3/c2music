@@ -1,0 +1,8 @@
+{
+  "main": "index.html",
+  "name": "c2music",
+  "window": {
+     "toolbar": false,
+     "title": "c2music"
+   }
+}
