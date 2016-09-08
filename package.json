@@ -2,7 +2,10 @@
   "main": "index.html",
   "name": "c2music",
   "window": {
-     "toolbar": false,
+     "toolbar": true,
      "title": "c2music"
+   },
+   "webkit": {
+      "plugin": true
    }
 }

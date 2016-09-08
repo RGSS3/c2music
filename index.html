@@ -70,23 +70,37 @@
         t.search = function(){ reset(); src("shadow-music", search + asKeyword("keyword"));  query("shadow-music").style.display = "block"; 
         setInternalWindow(query("shadow-music"))};    
      }else{
-        t.search = function(){ reset(); src("music", search + asKeyword("keyword"));  query("music").style.display = "block";};
+        t.search = function(){ reset(); src("music", search + asKeyword("keyword"));  query("music").style.display = "block"; Gl.url = null;};
      };
      t.login   = function(){ window.open(url); };
      t.share = function(){
-       var a = new XMLHttpRequest();
-       a.open("GET", "http://tinyurl.com/create.php?url=" + encodeURIComponent(Gl.url), false);
-       a.send();
-       var ret = a.responseText;
+       var ret = xget("http://tinyurl.com/create.php?url=" + encodeURIComponent(Gl.url))
        var mat = ret.match(/<a href="(http:\/\/tinyurl.com\/.*?)" target/);
-       var rs = mat[1] + "#[C2Music]" + query("shadow-music").contentWindow.document.title;
+       var rs = mat[1] + "#[C2Music]";
+       rs += query("shadow-music").contentWindow.document.title;
        if(window.confirm(rs)){
           clip.set(rs, 'text');
        } 
      }
      return t;
    };
+   var xget = function(url){
+     var a = new XMLHttpRequest();
+     a.open("GET", url, false);
+     a.send();
+     return a.responseText;
+   };
    Handlers["music.163.com"] = simple("http://music.163.com","http://music.163.com/#/search/m/?%23%2Fmsg%2Fm%2Fprivate=&s=");
+   Handlers["music.163.com"].share = function(){
+       var rs = src("music");
+       var u = rs.match(/\d\d\d\d\d*/)[0];
+       var info = xget("http://music.163.com/song?id=" + u);
+       var title = info.match(/<title>(.*?)<\/title>/)[1];
+       var url = "http://music.163.com/outchain/player#[C2Music]?type=2&id="+u+"&auto=1&height=66\n我正在听 " + title;
+       if(window.confirm(url)){
+          clip.set(url, 'text');
+       }
+   }
    Handlers["y.qq.com"] = simple("http://y.qq.com", "http://y.qq.com/portal/search.html#searchid=1&remoteplace=txt.yqq.top&t=song&w=");
    Handlers["www.xiami.com"] = simple("http://www.xiami.com", "http://www.xiami.com/search?pos=1&key=", {shadow: true});
    Handlers["www.kuwo.cn"] = simple("http://www.kuwo.cn", "http://sou.kuwo.cn/ws/NSearch?type=all&catalog=yueku2016&key=", {"shadow": true});
@@ -101,7 +115,7 @@
        Handlers[name].search();
    });
 
- click("login", function(){
+  click("login", function(){
        var name = value(query("service"));       
        Handlers[name].login();
    });
