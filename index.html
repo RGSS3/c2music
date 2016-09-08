@@ -67,6 +67,17 @@
         t.search = function(){ reset(); src("music", search + asKeyword("keyword"));  query("music").style.display = "block";};
      };
      t.login   = function(){ window.open(url); };
+     t.share = function(){
+       var a = new XMLHttpRequest();
+       a.open("GET", "http://tinyurl.com/create.php?url=" + encodeURIComponent(Gl.url), false);
+       a.send();
+       var ret = a.responseText;
+       var mat = ret.match(/<a href="(http:\/\/tinyurl.com\/.*?)" target/);
+       var rs = mat[1] + "#[C2Music]" + query("shadow-music").contentWindow.document.title;
+       if(window.confirm(rs)){
+          clip.set(rs, 'text');
+       } 
+     }
      return t;
    };
    Handlers["music.163.com"] = simple("http://music.163.com","http://music.163.com/#/search/m/?%23%2Fmsg%2Fm%2Fprivate=&s=");
@@ -88,14 +99,17 @@
        var name = value(query("service"));       
        Handlers[name].login();
    });
+
+
    var nw     = require('nw.gui');
    var win    = nw.Window.get();
    var clip    = nw.Clipboard.get();
    click("share", function(){
-     if(window.confirm(Gl.url)){
-        clip.set(Gl.url, 'text');
-     } 
+     var name = value(query("service"));
+     Handlers[name].share();
    });
+
+
    win.maximize();
    win.on('minimize', function(){
       var tray   = new nw.Tray({title: 'c2music', 'icon': 'image/icon.png'});
